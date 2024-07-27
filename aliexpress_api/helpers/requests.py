@@ -13,13 +13,19 @@ def api_request(request, response_name):
         raise ApiRequestException(error) from error
 
     try:
-        response = response[response_name]['resp_result']
+        response = response[response_name]
+        resp_code = response.get('rsp_code')
+        resp_msg = response.get('rsp_msg')
+        response = response.get('resp_result', response)
         response = json.dumps(response)
         response = json.loads(response, object_hook=lambda d: SimpleNamespace(**d))
     except Exception as error:
         raise ApiRequestResponseException(error) from error
 
-    if response.resp_code == 200:
+    resp_code = getattr(response, 'resp_code', resp_code)
+    resp_msg = getattr(response, 'resp_msg', resp_msg)
+
+    if resp_code == 200:
         return response.result
     else:
-        raise ApiRequestResponseException(f'Response code {response.resp_code} - {response.resp_msg}')
+        raise ApiRequestResponseException(f'Response code {resp_code} - {resp_msg}')

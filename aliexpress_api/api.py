@@ -45,6 +45,15 @@ class AliexpressApi:
         self.categories = None
         setDefaultAppInfo(self._key, self._secret)
 
+    def get_dropshipping_product_details(self, product_id: str, ship_to_country: str):
+        request = aliapi.rest.AliexpressDropshippingProductdetailGetRequest()
+        request.product_id = product_id
+        request.ship_to_country = ship_to_country
+        request.app_signature = self._app_signature
+        request.target_currency = self._currency
+        request.target_language = self._language
+        response = api_request(request, 'aliexpress_ds_product_get_response')
+        return response
 
     def get_products_details(self,
         product_ids: Union[str, List[str]],
